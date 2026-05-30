@@ -1,0 +1,176 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  password  String
+  name      String?
+  phone     String?
+  nationality String?
+  role      Role       @default(USER)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  bookings  Booking[]
+  reviews   Review[]
+}
+
+model Area {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  slug      String     @unique
+  description String?
+  imageUrl  String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  hotels    Hotel[]
+}
+
+model Hotel {
+  id            String     @id @default(cuid())
+  name          String
+  slug          String     @unique
+  description   String
+  address       String
+  areaId        String
+  nearestBeach  String
+  distanceToBeach Float
+  isBeachfront  Boolean    @default(false)
+  hasSeaView    Boolean    @default(false)
+  starRating    Float      @default(3.0)
+  guestRating   Float?
+  reviewCount   Int        @default(0)
+  propertyType  String     @default("Hotel")
+  images        String     @default("[]")
+  amenities     String     @default("[]")
+  status        String     @default("active")
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  area      Area       @relation(fields: [areaId], references: [id])
+  rooms     Room[]
+  bookings  Booking[]
+  reviews   Review[]
+}
+
+model Room {
+  id                  String     @id @default(cuid())
+  hotelId             String
+  name                String
+  description         String?
+  image               String?
+  bedType             String
+  roomSize            Float
+  maxGuests           Int
+  hasSeaView          Boolean    @default(false)
+  breakfastIncluded   Boolean    @default(false)
+  cancellationPolicy  String     @default("Non-refundable")
+  pricePerNight       Float
+  discountPrice       Float?
+  totalRooms          Int
+  availableRooms      Int
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  hotel     Hotel      @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  bookings  Booking[]
+}
+
+model Booking {
+  id                String     @id @default(cuid())
+  userId            String
+  hotelId           String
+  roomId            String
+  guestName         String
+  guestEmail        String
+  guestPhone        String
+  nationality       String?
+  checkInDate       DateTime
+  checkOutDate      DateTime
+  guests            Int
+  rooms             Int
+  nights            Int
+  pricePerNight     Float
+  subtotal          Float
+  vat               Float
+  serviceFee        Float
+  addonTotal        Float      @default(0)
+  totalAmount       Float
+  currency          String     @default("BDT")
+  paymentMethod     String
+  paymentStatus     String     @default("pending")
+  bookingStatus     String     @default("pending")
+  specialRequests   String?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  user      User       @relation(fields: [userId], references: [id])
+  hotel     Hotel      @relation(fields: [hotelId], references: [id])
+  room      Room       @relation(fields: [roomId], references: [id])
+  addons    BookingAddon[]
+}
+
+model BookingAddon {
+  id            String     @id @default(cuid())
+  bookingId     String
+  travelAddonId String
+  price         Float
+  createdAt     DateTime   @default(now())
+
+  booking       Booking    @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  travelAddon   TravelAddon @relation(fields: [travelAddonId], references: [id])
+}
+
+model Review {
+  id        String     @id @default(cuid())
+  userId    String
+  hotelId   String
+  rating    Int
+  title     String
+  comment   String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  user      User       @relation(fields: [userId], references: [id])
+  hotel     Hotel      @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+}
+
+model TravelAddon {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  category    String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  bookings    BookingAddon[]
+}
+
+model Attraction {
+  id          String     @id @default(cuid())
+  name        String
+  description String
+  location    String
+  areaId      String?
+  imageUrl    String?
+  category    String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+}
