@@ -328,7 +328,7 @@ async function main() {
 
   const rooms: any[] = []
   for (const hotel of hotels) {
-    const hotelData = hotelData.find((h) => h.name === hotel.name)!
+    const currentHotelData = hotelData.find((h) => h.name === hotel.name)!
     const basePriceMultiplier = [2000, 3500, 5000, 6500, 4000, 4500, 3000, 5500, 8000, 5500, 3500, 3000, 5000, 4000, 4500, 6500, 4500, 3000, 5500, 4000][
       hotels.indexOf(hotel)
     ]
