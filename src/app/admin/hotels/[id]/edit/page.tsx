@@ -12,6 +12,19 @@ async function getAreas() {
   return await prisma.area.findMany()
 }
 
+export async function generateStaticParams() {
+  try {
+    const hotels = await prisma.hotel.findMany({
+      select: { id: true },
+    })
+    return hotels.map((hotel) => ({
+      id: hotel.id,
+    }))
+  } catch (error) {
+    return []
+  }
+}
+
 export default async function EditHotelPage({ params }: { params: { id: string } }) {
   await AdminGuard()
   const hotel = await getHotel(params.id)

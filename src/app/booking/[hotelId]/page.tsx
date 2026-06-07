@@ -18,6 +18,19 @@ async function getAddons() {
   return await prisma.travelAddon.findMany()
 }
 
+export async function generateStaticParams() {
+  try {
+    const hotels = await prisma.hotel.findMany({
+      select: { id: true },
+    })
+    return hotels.map((hotel) => ({
+      hotelId: hotel.id,
+    }))
+  } catch (error) {
+    return []
+  }
+}
+
 export default async function BookingPage({
   params,
   searchParams,

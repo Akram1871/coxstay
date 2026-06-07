@@ -1,10 +1,25 @@
-'use server'
-
 import prisma from '@/lib/db'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+
+// Mock cookies for static export compatibility
+const mockCookies = {
+  set: (name: string, value: string, options: any) => {
+    if (typeof document !== 'undefined') {
+      document.cookie = `${name}=${value}; path=/;`
+    }
+  },
+}
+
+async function getCookies() {
+  try {
+    const { cookies } = await import('next/headers')
+    return await cookies()
+  } catch (error) {
+    return mockCookies
+  }
+}
 
 export async function registerUser(email: string, password: string, name: string) {
   try {
@@ -42,7 +57,7 @@ export async function registerUser(email: string, password: string, name: string
     )
 
     // Set cookie
-    const cookieStore = await cookies()
+    const cookieStore = await getCookies()
     cookieStore.set('auth-token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -100,7 +115,7 @@ export async function loginUser(email: string, password: string) {
     )
 
     // Set cookie
-    const cookieStore = await cookies()
+    const cookieStore = await getCookies()
     cookieStore.set('auth-token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -126,7 +141,8 @@ export async function loginUser(email: string, password: string) {
 }
 
 export async function logoutUser() {
-  const cookieStore = await cookies()
-  cookieStore.delete('auth-token')
-  redirect('/login')
+  const cookieStore = await getCookies()
+  if ('delete' in cookieStore) {
+    cookieStore.delete('auth-token')
+  }
 }

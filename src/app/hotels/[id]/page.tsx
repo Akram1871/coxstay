@@ -22,6 +22,19 @@ async function getHotel(id: string) {
   return hotel
 }
 
+export async function generateStaticParams() {
+  try {
+    const hotels = await prisma.hotel.findMany({
+      select: { id: true },
+    })
+    return hotels.map((hotel) => ({
+      id: hotel.id,
+    }))
+  } catch (error) {
+    return []
+  }
+}
+
 export default async function HotelDetailPage({ params }: { params: { id: string } }) {
   const hotel = await getHotel(params.id)
 
@@ -46,7 +59,7 @@ export default async function HotelDetailPage({ params }: { params: { id: string
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
-              {images.slice(1, 5).map((img, i) => (
+              {images.slice(1, 5).map((img: string, i: number) => (
                 <div key={i} className="h-44 bg-gray-200 rounded-lg overflow-hidden">
                   <img src={img} alt={`${hotel.name} ${i + 2}`} className="w-full h-full object-cover" />
                 </div>

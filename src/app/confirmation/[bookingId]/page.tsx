@@ -19,6 +19,19 @@ async function getBooking(id: string) {
   })
 }
 
+export async function generateStaticParams() {
+  try {
+    const bookings = await prisma.booking.findMany({
+      select: { id: true },
+    })
+    return bookings.map((booking) => ({
+      bookingId: booking.id,
+    }))
+  } catch (error) {
+    return []
+  }
+}
+
 export default async function ConfirmationPage({ params }: { params: { bookingId: string } }) {
   const booking = await getBooking(params.bookingId)
 
@@ -54,7 +67,6 @@ export default async function ConfirmationPage({ params }: { params: { bookingId
               <div className="space-y-2 text-gray-700">
                 <p><strong>Hotel:</strong> {booking.hotel.name}</p>
                 <p><strong>Room:</strong> {booking.room.name}</p>
-                <p><strong>Area:</strong> {booking.hotel.area}</p>
               </div>
             </div>
 

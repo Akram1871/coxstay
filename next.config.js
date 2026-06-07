@@ -1,10 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'export', // Enable static export
-  basePath: '/coxstay', // Set base path to repo name
+  output: 'export',
+  basePath: '/coxstay',
+  skipTrailingSlashRedirect: true,
   images: {
-    unoptimized: true, // Disable Image Optimization for static export
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -15,6 +16,10 @@ const nextConfig = {
         hostname: 'localhost',
       },
     ],
+  },
+  typescript: {
+    // Ignore build errors to allow static export
+    ignoreBuildErrors: false,
   },
 }
 

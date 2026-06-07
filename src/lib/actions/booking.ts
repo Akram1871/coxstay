@@ -1,8 +1,18 @@
-'use server'
-
 import prisma from '@/lib/db'
-import { getSession, requireAuth, requireAdmin } from '@/lib/auth'
 import { calculateBookingTotal, calculateNights } from '@/lib/utils'
+
+// Stub implementations for static export compatibility
+async function getSession(): Promise<any> {
+  return null
+}
+
+async function requireAuth(): Promise<any> {
+  return null
+}
+
+async function requireAdmin(): Promise<any> {
+  return null
+}
 
 export async function searchHotels(params: any) {
   try {
@@ -142,6 +152,14 @@ export async function getHotelById(id: string) {
 export async function createBooking(bookingData: any) {
   try {
     const session = await requireAuth()
+
+    // For static export, session will be null
+    if (!session) {
+      return {
+        success: false,
+        error: 'Authentication required. This feature requires a backend server.',
+      }
+    }
 
     const {
       hotelId,

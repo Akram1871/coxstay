@@ -4,8 +4,14 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { Menu, X, LogOut, User } from 'lucide-react'
-import { logoutUser } from '@/lib/actions/auth'
 import { getSession } from '@/lib/auth'
+
+// Client-side logout handler
+async function handleLogout() {
+  // Clear the auth token from cookies
+  document.cookie = 'auth-token=; expires=Thu, 01 Jan 1970 00:00:01 UTC; path=/;'
+  window.location.href = '/'
+}
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -38,8 +44,10 @@ export function Navbar() {
     }
   }, [])
 
-  const handleLogout = async () => {
-    await logoutUser()
+  const handleLogoutClick = async () => {
+    // Clear the auth token from cookies
+    document.cookie = 'auth-token=; expires=Thu, 01 Jan 1970 00:00:01 UTC; path=/;'
+    window.location.href = '/'
   }
 
   const isActive = (path: string) => pathname === path
@@ -112,7 +120,7 @@ export function Navbar() {
                   <span className="hidden sm:inline">Dashboard</span>
                 </Link>
                 <button
-                  onClick={handleLogout}
+                  onClick={handleLogoutClick}
                   className="text-sm font-medium text-red-600 hover:text-red-700 flex items-center space-x-1"
                 >
                   <LogOut size={18} />
